@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.1",
+    "dotenv": "^16.4.7",
+    "motion": "^12.6.3",
     "primeicons": "^7.0.0",
     "primereact": "^10.9.4",
     "react": "^19.0.0",

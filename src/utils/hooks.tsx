@@ -10,12 +10,12 @@ export function useApi() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<ApiError | null>(null);
 
-  const request = useCallback(async <T,>(url: string, options?: RequestInit): Promise<T> => {
+  const request = useCallback(async <T,>(endpoint: string, options?: RequestInit): Promise<T> => {
     setLoading(true);
     setError(null);
 
     try {
-      const response = await fetch(url, {
+      const response = await fetch(import.meta.env.VITE_API_URL + endpoint, {
         ...options,
         credentials: "include", // Ajout des cookies dans la requête
       });
@@ -35,8 +35,8 @@ export function useApi() {
   }, []);
 
   const get = useCallback(
-    async <T,>(url: string): Promise<T> => {
-      return request<T>(url, {
+    async <T,>(endpoint: string): Promise<T> => {
+      return request<T>(endpoint, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
@@ -45,8 +45,8 @@ export function useApi() {
   );
 
   const post = useCallback(
-    async <T,>(url: string, body: object): Promise<T> => {
-      return request<T>(url, {
+    async <T,>(endpoint: string, body: object): Promise<T> => {
+      return request<T>(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

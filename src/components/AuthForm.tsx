@@ -1,18 +1,22 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import { useApi } from "../utils/hooks";
 import TextInput from "../components/TextInput";
+import { Link, useNavigate } from "react-router-dom";
 
 interface AuthFormProps {
   title: string;
   endpoint: string;
   fields: { label: string; id: string; type?: string }[];
   buttonText: string;
+  children?: React.ReactNode; // Ajout de children ici
 }
 
-const AuthForm: React.FC<AuthFormProps> = ({ title, endpoint, fields, buttonText }) => {
+const AuthForm: React.FC<AuthFormProps> = ({ title, endpoint, fields, buttonText, children }) => {
   const [formData, setFormData] = useState<{ [key: string]: string }>({});
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
+
+  const navigate = useNavigate();
 
   const { post, loading, error } = useApi();
 
@@ -25,13 +29,14 @@ const AuthForm: React.FC<AuthFormProps> = ({ title, endpoint, fields, buttonText
     try {
       const response = await post<{ message: string }>(endpoint, formData);
       setMessage(response.message);
+      navigate("/");
     } catch (err) {
       console.error("Erreur lors de la requête", err);
     }
   };
 
   return (
-    <main className="w-full min-h-dvh flex justify-center items-center">
+    <main className="w-full min-h-dvh flex justify-center items-center p-2">
       <div className="w-full max-w-130 bg-neutral-50 p-10 rounded-md flex flex-col items-center gap-3">
         <h1 className="font-bold text-3xl">{title}</h1>
         {error && (
@@ -72,6 +77,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ title, endpoint, fields, buttonText
             {loading ? "Chargement..." : buttonText}
           </button>
         </form>
+        {children && children}
       </div>
     </main>
   );
@@ -80,15 +86,31 @@ const AuthForm: React.FC<AuthFormProps> = ({ title, endpoint, fields, buttonText
 export const Register = () => (
   <AuthForm
     title="Créer un compte"
-    endpoint="https://127.0.0.1:8000/api/register"
+    endpoint="/register"
     fields={[
       { label: "Pseudo", id: "pseudo" },
       { label: "Email", id: "email", type: "email" },
     ]}
-    buttonText="Créer"
-  />
+    buttonText="Créer">
+    <div className="mt-4 text-center">
+      <Link to="/" className="text-indigo-500 hover:underline">
+        Retour
+      </Link>
+    </div>
+  </AuthForm>
 );
 
-export const Login = () => <AuthForm title="Connexion" endpoint="https://127.0.0.1:8000/api/login" fields={[{ label: "Email", id: "email", type: "email" }]} buttonText="Se connecter" />;
+export const Login = () => (
+  <AuthForm title="Connexion" endpoint="/login" fields={[{ label: "Email", id: "email", type: "email" }]} buttonText="Se connecter">
+    <div className="mt-4 text-center">
+      <p className="text-sm">
+        Pas de compte ?{" "}
+        <Link to="/register" className="text-indigo-500 hover:underline">
+          Créer un compte
+        </Link>
+      </p>
+    </div>
+  </AuthForm>
+);
 
 export default AuthForm;
